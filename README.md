@@ -45,7 +45,7 @@ Train a classification layer with batchsize = 64, num_epochs = 3, dropout = 0.1,
 
 
 ```shell
-scripts/scan_classification_layer.sh 
+bash scripts/scan_classification_layer.sh 
 # inspect results for e.g. google_snippets
 cat google_snippets/scan_results_classification_layer.txt # each experiment is run 5 times and we show the mean and standard error for the 5 runs
 ```
