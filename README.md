@@ -8,6 +8,30 @@ Assuming [Anaconda](https://docs.anaconda.com/anaconda/install/) and linux, the 
 ```shell
 bash setup_environment.sh
 ```
+## Run DOCSCAN on new dataset
+
+First, one needs to create a folder with the data. We need two files in that folder: train.jsonl and test.jsonl
+
+Both files contain lines where each line is a datapoint stored as a json dictionairy. The keys must be "text" and "label" (we don't need labels for train.jsonl, so this can contain dummies as well). 
+
+We can then run the following script (first argument is the path to the folder, second argument the number of clusters). For the google_snippets dataset, we can run DOCScan with the following command
+
+```shell
+bash scripts/run_docscan.sh google_snippets 8
+```
+This generates a number of files:
+* train_embedded.pkl (sbert embeddings for train file)
+* test_embedded.pkl (sbert embeddings for test file)
+* train_neighbours.jsonl (pairs of datapoint/neighbors for each datapoint)
+* train_neighbours_embeddings.pkl (embeddings of pairs of datapoint/neighbors for each datapoint)
+* mean_kmeans_tfidf.txt (averaged accuracy of 5 runs of kmeans with tf-idf features)
+* mean_kmeans_sbert.txt (averaged accuracy of 5 runs of kmeans with sbert features)
+* scan_results_classification_layer.txt (averaged accuracy of 5 runs of DOCScan)
+* predictions.txt (SCAN predictions for the file test.jsonl)
+
+## Replicate experiments in the paper
+
+To replicate the experiments in the paper, we provide code below.
 
 ## Data for Experiments
 
