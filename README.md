@@ -19,7 +19,7 @@ We can then run the following script (first argument is the path to the folder, 
 ```shell
 bash scripts/run_docscan.sh google_snippets 8
 ```
-This generates a number of files:
+This generates a number of files in the folder:
 * train_embedded.pkl (sbert embeddings for train file)
 * test_embedded.pkl (sbert embeddings for test file)
 * train_neighbours.jsonl (pairs of datapoint/neighbors for each datapoint)
