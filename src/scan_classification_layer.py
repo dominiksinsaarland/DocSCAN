@@ -113,7 +113,9 @@ def evaluate(model, val_dataloader):
 	hungarian_match_metrics = hungarian_evaluate(np.array(out["targets"]), np.array(out["predictions"]))
 	cm = hungarian_match_metrics["confusion matrix"]
 	clf_report = hungarian_match_metrics["classification_report"]
+	print (fn_val, hungarian_match_metrics)
 	del hungarian_match_metrics["classification_report"]
+
 	del hungarian_match_metrics["confusion matrix"]
 	print (cm, "\n", clf_report)
 	print (fn_val, hungarian_match_metrics)
@@ -121,9 +123,25 @@ def evaluate(model, val_dataloader):
 	return hungarian_match_metrics
 	
 
+def predict(model, val_dataloader, path):
+	with torch.no_grad():
+		out = model.get_predictions(val_dataloader)
+	#
+	hungarian_match_metrics = hungarian_evaluate(np.array(out["targets"]), np.array(out["predictions"]))
+	fn_val = os.path.join(path, "test_embedded.pkl")
+	df = pd.read_pickle(fn_val)
+	labels=np.unique(df["label"])
+	label2id = {label:i for i, label in enumerate(labels)}
+	id2label = {i:j for j,i in label2id.items()}
+
+	with open(os.path.join(path, "predictions.txt"), "w") as outfile:
+		for i in hungarian_match_metrics["reordered_preds"]:
+			outfile.write(str(id2label[i]) + "\n")
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--experiment", type=str, default="20newsgroup", help="")
+	parser.add_argument("--path", type=str, default="20newsgroup", help="")
 	parser.add_argument("--max_grad_norm", default=1.0, type=float, help="")
 	parser.add_argument("--gradient_accumulation_steps", type=int, default=1,
 		        help="Number of updates steps to accumulate before performing a backward/update pass.")
@@ -143,39 +161,20 @@ if __name__ == "__main__":
 		        help="Batch size per GPU/CPU for training.")
 	parser.add_argument("--weight_decay", default=0.0, type=float,
 		        help="Weight decay if we apply some.")
+	parser.add_argument("--num_clusters", default=1, type=int,
+		        help="number of clusters, if not defined, we set it to the number of classes in the training set")
 
 
 	args = parser.parse_args()
-	if args.experiment == "20newsgroup":
-		num_classes = 20
-		path = "20newsgroup"
-	elif args.experiment == "ag_news":
-		path = "ag_news"
-		num_classes = 4
-	elif args.experiment == "google_snippets":
-		path = "google_snippets"
-		num_classes = 8
-	elif args.experiment == "abstracts_group":
-		path = "abstracts_group"
-		num_classes = 5
-	elif args.experiment == "dbpedia":
-		path = "dbpedia"
-		num_classes = 14
-	elif args.experiment == "imdb":
-		path = "imdb"
-		num_classes = 2
-	elif args.experiment == "ner":
-		path = "CoNLL-2003"
-		num_classes = 4
-	elif args.experiment == "pos_tagging":
-		path = "brown_POS"
-		num_classes = 12
-	else:
-		print ("experiment unknown")
-		sys.exit(0)
 
-	fn_val = os.path.join(path, "test_embedded.pkl")
-	fn_train = os.path.join(path, "train_neighbours_embeddings.pkl")
+	fn_val = os.path.join(args.path, "test_embedded.pkl")
+	fn_train = os.path.join(args.path, "train_neighbours_embeddings.pkl")
+
+	if args.num_clusters == 1:
+		df = pd.read_pickle(fn_train)
+		num_classes = len(np.unique(df["label"]))
+	else:
+		num_classes = args.num_clusters
 
 	device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -196,7 +195,7 @@ if __name__ == "__main__":
 
 		optimizer = torch.optim.Adam(model.parameters(), lr=0.001, eps=1e-8)
 		# Loss function
-		criterion = SCANLoss(entropy_weight=args.entropy_weight, entropy=args.entropy_term, experiment=args.experiment)
+		criterion = SCANLoss(entropy_weight=args.entropy_weight, entropy=args.entropy_term, experiment=args.path)
 		criterion.to(device)
 		model.zero_grad()
 		model.train()
@@ -218,11 +217,11 @@ if __name__ == "__main__":
 		acc = evaluate(model, val_dataloader)["ACC"]
 		results.append(acc)
 
-	with open(os.path.join(path, "scan_results_classification_layer.txt"), "w") as outfile:
+	with open(os.path.join(args.path, "scan_results_classification_layer.txt"), "w") as outfile:
 		config_string = "lr: " + str(args.learning_rate) + " num_epochs: " +str(args.num_epochs) + " batch_size: " + str(args.batch_size) + " dropout: " + str(args.dropout)
 		print (np.round(np.mean(results), 3), np.std(results))
-		outfile.write(config_string + "\n")
-		outfile.write(str(results) + "\n")
+		#outfile.write(config_string + "\n")
+		#outfile.write(str(results) + "\n")
 		outfile.write("accuracy: " + str(np.round(np.mean(results), 3)) + "\nstandard error: " + str(np.round(np.std(results), 3)))
-
+		predict(model, val_dataloader, args.path)
 

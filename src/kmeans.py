@@ -86,6 +86,7 @@ if __name__ == "__main__":
 	parser.add_argument("--features", type=str, default="sbert", help="")
 	parser.add_argument("--train_file", type=str, default="")
 	parser.add_argument("--test_file", type=str, default="")
+	parser.add_argument("--n_clusters", type=int, default=1)
 
 
 	args = parser.parse_args()
@@ -113,7 +114,11 @@ if __name__ == "__main__":
 		vectorized_test = vect.transform(df_test["sentence"])
 		X_test = tfidf.transform(vectorized_test)
 	results = []
-	n_clusters = len(np.unique(df_train["label"]))
+	if args.n_clusters != 1:
+		n_clusters = args.n_clusters
+	else:
+		n_clusters = len(np.unique(df_train["label"]))
+
 	print (n_clusters)
 	print (np.unique(df_test["label"], return_counts=True))
 	for _ in range(5):

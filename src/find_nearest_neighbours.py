@@ -55,8 +55,8 @@ if __name__ == "__main__":
 		print ("training set accuracies", [np.round(i * 100, 1) for i in acc_train])
 
 
-	indices, acc = memory_bank_base.mine_nearest_neighbors(args.topk, show_eval=True)
-	print('Accuracy of top-%d nearest neighbors on train set is %.2f' %(args.topk, 100*acc))
+	indices, acc = memory_bank_base.mine_nearest_neighbors(args.topk, show_eval=False)
+	#print('Accuracy of top-%d nearest neighbors on train set is %.2f' %(args.topk, 100*acc))
 
 
 	sentences = df_train["sentence"].tolist()

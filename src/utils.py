@@ -63,5 +63,5 @@ def hungarian_evaluate(targets, predictions, class_names=None,
     #confusion_matrix(reordered_preds, targets, 
     #                class_names, confusion_matrix_file)
 
-    return {'ACC': acc, 'ARI': ari, 'NMI': nmi, 'hungarian_match': match, "classification_report": classification_report, "confusion matrix": cm}
+    return {'ACC': acc, 'ARI': ari, 'NMI': nmi, 'hungarian_match': match, "classification_report": classification_report, "confusion matrix": cm, "reordered_preds": reordered_preds}
 
