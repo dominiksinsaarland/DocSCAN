@@ -1,6 +1,6 @@
-# SCAN_for_NLP
-Learning from Neighbors: Unsupervised Text Classification
+# DocSCAN
 
+This is the code base for our paper [DocSCAN: Unsupervised Text Classification via Learning from Neighbors](https://arxiv.org/abs/2105.04024)
 
 ## Installation
 
