@@ -153,6 +153,9 @@ if __name__ == "__main__":
 		        help="Batch size per GPU/CPU for training.")
 	parser.add_argument("--num_epochs", default=3, type=int,
 		        help="Total number of training epochs to perform.")
+	parser.add_argument("--num_runs", default=3, type=int,
+		        help="Total number of training epochs to perform.")
+
 	parser.add_argument("--learning_rate", default=0.001, type=float,
 		        help="The initial learning rate for Adam.")
 	parser.add_argument("--adam_epsilon", default=1e-8, type=float,
@@ -193,7 +196,7 @@ if __name__ == "__main__":
 
 	results = []
 
-	for _ in range(5):
+	for _ in range(args.num_runs):
 		model = SCAN_model(num_classes, args.dropout)
 		model.to(device)
 
