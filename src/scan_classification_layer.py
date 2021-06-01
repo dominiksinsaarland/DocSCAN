@@ -131,13 +131,17 @@ def predict(model, val_dataloader, path):
 	fn_val = os.path.join(path, "test_embedded.pkl")
 	df = pd.read_pickle(fn_val)
 	labels=np.unique(df["label"])
-	label2id = {label:i for i, label in enumerate(labels)}
-	id2label = {i:j for j,i in label2id.items()}
+	if len(labels) > 1:
+		label2id = {label:i for i, label in enumerate(labels)}
+		id2label = {i:j for j,i in label2id.items()}
 
-	with open(os.path.join(path, "predictions.txt"), "w") as outfile:
-		for i in hungarian_match_metrics["reordered_preds"]:
-			outfile.write(str(id2label[i]) + "\n")
-
+		with open(os.path.join(path, "predictions.txt"), "w") as outfile:
+			for i in hungarian_match_metrics["reordered_preds"]:
+				outfile.write(str(id2label[i]) + "\n")
+	else:
+		with open(os.path.join(path, "predictions.txt"), "w") as outfile:
+			for i in out["predictions"]:
+				outfile.write(str(i) + "\n")
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
