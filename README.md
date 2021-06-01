@@ -29,6 +29,16 @@ This generates a number of files in the folder:
 * scan_results_classification_layer.txt (averaged accuracy of 5 runs of DOCScan)
 * predictions.txt (SCAN predictions for the file test.jsonl)
 
+## Run DOCSCAN on a raw txt file where each line is a datapoint
+
+If we have a file where each line is an example, we can run docscan on this using the following script.
+
+```shell
+bash run_docscan_with_txt_file_as_input.sh $output_dir $num_clusters $path_to_filename
+```
+
+Where we have to specify $output_dir (which gets created in the script), the numbers of clusters and the path to the filename. It will then create a file "predictions.txt" in the output directory where we have the scan predictions.
+
 ## Replicate experiments in the paper
 
 To replicate the experiments in the paper, we provide code below.
