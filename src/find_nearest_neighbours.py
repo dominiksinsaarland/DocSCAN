@@ -74,7 +74,8 @@ if __name__ == "__main__":
 		anchor = index[0]
 		neighbours = index[1:]
 		for neighbour in neighbours:
-			examples.append([X_train[anchor].tolist(), X_train[neighbour].tolist(), labels_map[label]])
+			#examples.append([X_train[anchor].tolist(), X_train[neighbour].tolist(), labels_map[label]])
+			examples.append([anchor, neighbour, labels_map[label]])
 
 	df = pd.DataFrame(examples, columns=["anchor", "neighbour", "label"])
 	df.to_pickle(os.path.join(args.path, "train_neighbours_embeddings.pkl"))

@@ -22,7 +22,7 @@ from utils import *
 
 
 class ScanDataset(Dataset):
-	def __init__(self, filename, mode="train", translation_fn=None):
+	def __init__(self, filename, embeddings=None, mode="train", translation_fn=None):
 		self.filename = filename
 		self.mode = mode
 		self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -31,9 +31,9 @@ class ScanDataset(Dataset):
 			self.examples = self.load_data()
 		elif mode == "val":
 			self.examples = self.load_val_data()
+		self.embeddings = embeddings
 	def load_data(self):
 		examples = []
-
 		df = pd.read_pickle(self.filename)
 		anchors = df["anchor"].tolist()
 		neighbours = df["neighbour"].tolist()
@@ -69,8 +69,8 @@ class ScanDataset(Dataset):
 			sample = {"anchor": anchor, "label": label}
 		return sample
 	def collate_fn(self, batch):
-		out = torch.tensor([i["anchor"] for i in batch])
-		out_2 = torch.tensor([i["neighbour"] for i in batch])
+		out = torch.tensor([self.embeddings[i["anchor"]] for i in batch])
+		out_2 = torch.tensor([self.embeddings[i["neighbour"]] for i in batch])
 		return {"anchor": out, "neighbour": out_2}
 
 	def collate_fn_val(self, batch):
@@ -85,6 +85,7 @@ class SCAN_model(torch.nn.Module):
 		self.classifier = torch.nn.Linear(768, num_labels)
 		self.device = "cuda" if torch.cuda.is_available() else "cpu"
 		self.dropout = dropout
+
 	def forward(self, feature):
 		if self.dropout is not None:
 			dropout = torch.nn.Dropout(p=self.dropout)
@@ -188,7 +189,11 @@ if __name__ == "__main__":
 	# CUDNN
 	torch.backends.cudnn.benchmark = True
 
-	train_dataset = ScanDataset(fn_train, mode="train")
+	embeddings_df = os.path.join(args.path, "train_embedded.pkl")
+	df_embeddings = pd.read_pickle(embeddings_df)	
+	train_embeddings = np.array(df_embeddings["embeddings"].tolist())
+
+	train_dataset = ScanDataset(fn_train,train_embeddings, mode="train")
 	val_dataset = ScanDataset(fn_val, mode="val")
 
 	train_dataloader = torch.utils.data.DataLoader(train_dataset, shuffle=True, collate_fn = train_dataset.collate_fn, batch_size=args.batch_size)
