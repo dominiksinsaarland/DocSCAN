@@ -139,10 +139,18 @@ def predict(model, val_dataloader, path):
 		with open(os.path.join(path, "predictions.txt"), "w") as outfile:
 			for i in hungarian_match_metrics["reordered_preds"]:
 				outfile.write(str(id2label[i]) + "\n")
+		with open(os.path.join(path, "probabilities.txt"), "w") as outfile:
+			for i in out["probabilities"]:
+				outfile.write("\t".join(list(map(str, i))) + "\n")
+
 	else:
 		with open(os.path.join(path, "predictions.txt"), "w") as outfile:
 			for i in out["predictions"]:
 				outfile.write(str(i) + "\n")
+		with open(os.path.join(path, "probabilities.txt"), "w") as outfile:
+			for i in out["probabilities"]:
+				outfile.write("\t".join(list(map(str, i))) + "\n")
+				
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
