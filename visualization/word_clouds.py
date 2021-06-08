@@ -7,6 +7,7 @@ from spacy.lang.en import English
 from collections import Counter
 import numpy as np
 from random import randint
+from tqdm import tqdm
 import re
 
 def load_clusters(fn):
@@ -33,10 +34,10 @@ def generate_word_clouds(topic, df_topic, nlp, outpath):
 		          max_font_size=120,
 		          color_func=colorfunc,
 		          height=600,width=800).generate_from_frequencies(word_counts)
-	print (word_counts.most_common(n=25))
+	#print (word_counts.most_common(n=25))
 
 	if topic.isdigit():
-		print (topic)
+		#print (topic)
 		# if we don't have topic label, but just e.g. cluster "86", we take the first five words as a description		
 		save_filename = topic + "_" + "_".join([i[0] for i in word_counts.most_common(n=5)])
 	else:
@@ -45,7 +46,7 @@ def generate_word_clouds(topic, df_topic, nlp, outpath):
 	plt.imshow(wordcloud,interpolation="bilinear")
 	plt.axis("off")
 	#plt.show()
-	print (save_filename)
+	#print (save_filename)
 	plt.savefig(os.path.join(outpath, save_filename))
 
 if __name__ == "__main__":
@@ -72,9 +73,9 @@ if __name__ == "__main__":
 	df = pd.read_pickle(filename)
 	clusters = load_clusters(os.path.join(args.path, "predictions.txt"))
 	df["clusters"] = clusters
-	for topic in np.unique(clusters):
+	for topic in tqdm(np.unique(clusters)):
 		df_topic = df[df["clusters"] == topic]
-		print (topic, len(df_topic))
+		#print (topic, len(df_topic))
 		generate_word_clouds(topic, df_topic, nlp, outpath)
 	"""
 	genearte_word_clouds
