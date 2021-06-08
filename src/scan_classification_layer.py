@@ -129,7 +129,10 @@ def predict(model, val_dataloader, path):
 		out = model.get_predictions(val_dataloader)
 	#
 	hungarian_match_metrics = hungarian_evaluate(np.array(out["targets"]), np.array(out["predictions"]))
-	fn_val = os.path.join(path, "test_embedded.pkl")
+	if os.path.exists(args.path, "test_embedded.pkl"):
+		fn_val = os.path.join(args.path, "test_embedded.pkl")
+	else:
+		fn_val = os.path.join(args.path, "train_embedded.pkl")
 	df = pd.read_pickle(fn_val)
 	labels=np.unique(df["label"])
 	if len(labels) > 1:
@@ -183,7 +186,11 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	fn_val = os.path.join(args.path, "test_embedded.pkl")
+	if os.path.exists(args.path, "test_embedded.pkl"):
+		fn_val = os.path.join(args.path, "test_embedded.pkl")
+	else:
+		fn_val = os.path.join(args.path, "train_embedded.pkl")
+
 	fn_train = os.path.join(args.path, "train_neighbours_embeddings.pkl")
 
 	if args.num_clusters == 1:

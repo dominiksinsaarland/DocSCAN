@@ -8,7 +8,7 @@ python src/preprocess_text_file.py --path $path --infile $infile
 
 # compute embeddings
 python src/compute_sbert_embeddings.py --infile $path/train.jsonl --outfile $path/train_embedded.pkl
-cp $path/train_embeded.pkl $path/test_embedded.pkl
+#cp $path/train_embeded.pkl $path/test_embedded.pkl
 
 # retrieve neighbors
 python src/find_nearest_neighbours.py --path $path
