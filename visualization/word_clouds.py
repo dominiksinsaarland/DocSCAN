@@ -43,6 +43,7 @@ def generate_word_clouds(topic, df_topic, nlp, outpath):
 	plt.imshow(wordcloud,interpolation="bilinear")
 	plt.axis("off")
 	#plt.show()
+	print (save_filename)
 	plt.savefig(os.path.join(outpath, save_filename))
 
 if __name__ == "__main__":
