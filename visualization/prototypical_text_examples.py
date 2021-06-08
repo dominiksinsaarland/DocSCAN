@@ -46,7 +46,7 @@ if __name__ == "__main__":
 			if label2id:
 				probabilites = [i[label2id[topic]] for i in df["probabilities"]]
 			else:
-				probabilites = [i[label2id[int(topic)]] for i in df["probabilities"]]
+				probabilites = [i[int(topic)] for i in df["probabilities"]]
 			indices = np.argsort(probabilites)[-10:]
 			for i in indices:
 				#print (probabilities[i], "--", df.iloc[i]["sentence"])
