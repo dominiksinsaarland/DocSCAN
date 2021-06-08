@@ -35,6 +35,7 @@ def generate_word_clouds(topic, df_topic, nlp, outpath):
 	print (word_counts.most_common(n=25))
 
 	if topic.isdigit():
+		print (topic)
 		# if we don't have topic label, but just e.g. cluster "86", we take the first five words as a description		
 		save_filename = topic + "_" + "_".join([i[0] for i in word_counts.most_common(n=5)])
 	else:
