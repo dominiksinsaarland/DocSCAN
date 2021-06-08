@@ -21,7 +21,7 @@ if __name__ == "__main__":
 	parser.add_argument("--model", default="", type=str, help="")
 	parser.add_argument("--infile", default=None, type=str, help="", required=True)
 	parser.add_argument("--outfile", default=None, type=str, help="", required=True)
-	parser.add_argument("--max_seq_length", default=128, type=int, help="", required=True)
+	parser.add_argument("--max_seq_length", default=128, type=int, help="")
 
 	args = parser.parse_args()
 	print (args.infile)
