@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import argparse
 import json
+from tqdm import tqdm
 
 def load_clusters(fn):
 	with open(fn) as f:
@@ -40,7 +41,7 @@ if __name__ == "__main__":
 	df["probabilities"] = probabilities
 
 	with open(os.path.join(args.path, args.outfile), "w") as outfile:
-		for topic in np.unique(clusters):
+		for topic in tqdm(np.unique(clusters)):
 			df_topic = df[df["clusters"] == topic]
 			if label2id:
 				probabilites = [i[label2id[topic]] for i in df["probabilities"]]
