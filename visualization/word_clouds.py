@@ -17,7 +17,7 @@ def load_clusters(fn):
 def generate_word_clouds(topic, df_topic, nlp, outpath):
 	word_counts = Counter()
 	for sent in df_topic["sentence"]:
-		word_counts.update([w.lemma_.lower() for w in nlp(sent) if not w.is_stop and re.sub("\W*", "", w.text)])
+		word_counts.update([re.sub("\W*", "", w.lemma_.lower()) for w in nlp(sent) if not w.is_stop and re.sub("\W*", "", w.text)])
 
 	maincol = randint(0,360)
 	def colorfunc(word=None, font_size=None, 
