@@ -34,7 +34,7 @@ This generates a number of files in the folder:
 If we have a file where each line is an example, we can run docscan on this using the following script.
 
 ```shell
-bash run_docscan_with_txt_file_as_input.sh $output_dir $num_clusters $path_to_filename
+bash scripts/run_docscan_with_txt_file_as_input.sh $output_dir $num_clusters $path_to_filename
 ```
 
 Where we have to specify $output_dir (which gets created in the script), the numbers of clusters and the path to the filename. It will then create a file "predictions.txt" in the output directory, one prediction per line where each line corresponds to the text example at this line in the input file.
