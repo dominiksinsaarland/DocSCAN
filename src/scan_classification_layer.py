@@ -129,7 +129,7 @@ def predict(model, val_dataloader, path):
 		out = model.get_predictions(val_dataloader)
 	#
 	hungarian_match_metrics = hungarian_evaluate(np.array(out["targets"]), np.array(out["predictions"]))
-	if os.path.exists(args.path, "test_embedded.pkl"):
+	if os.path.exists(os.path.join(args.path, "test_embedded.pkl")):
 		fn_val = os.path.join(args.path, "test_embedded.pkl")
 	else:
 		fn_val = os.path.join(args.path, "train_embedded.pkl")
@@ -186,7 +186,7 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	if os.path.exists(args.path, "test_embedded.pkl"):
+	if os.path.exists(os.path.join(args.path, "test_embedded.pkl")):
 		fn_val = os.path.join(args.path, "test_embedded.pkl")
 	else:
 		fn_val = os.path.join(args.path, "train_embedded.pkl")
