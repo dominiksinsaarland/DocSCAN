@@ -9,10 +9,8 @@ import numpy as np
 from random import randint
 
 def load_clusters(fn):
-	print (fn)
 	with open(fn) as f:
 		clusters = [i.strip() for i in f]
-	print (len(clusters))
 	return clusters
 
 def generate_word_clouds(topic, df_topic, nlp, outpath):
@@ -40,7 +38,7 @@ def generate_word_clouds(topic, df_topic, nlp, outpath):
 		# if we don't have topic label, but just e.g. cluster "86", we take the first five words as a description		
 		save_filename = topic + "_" + "_".join([i[0] for i in word_counts.most_common(n=5)])
 	else:
-		save_filename = topic
+		save_filename = topic + ".png"
 	plt.clf()
 	plt.imshow(wordcloud,interpolation="bilinear")
 	plt.axis("off")
