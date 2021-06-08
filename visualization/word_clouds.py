@@ -7,6 +7,7 @@ from spacy.lang.en import English
 from collections import Counter
 import numpy as np
 from random import randint
+import re
 
 def load_clusters(fn):
 	with open(fn) as f:
@@ -16,7 +17,7 @@ def load_clusters(fn):
 def generate_word_clouds(topic, df_topic, nlp, outpath):
 	word_counts = Counter()
 	for sent in df_topic["sentence"]:
-		word_counts.update([tok.lemma_.lower() for tok in nlp(sent)])
+		word_counts.update([w.lemma_.lower() for w in nlp(sent) if not w.is_stop and re.sub("\W*", "", w.text)])
 
 	maincol = randint(0,360)
 	def colorfunc(word=None, font_size=None, 
