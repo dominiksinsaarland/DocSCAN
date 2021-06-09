@@ -145,6 +145,11 @@ def predict(model, val_dataloader, path):
 		with open(os.path.join(path, "probabilities.txt"), "w") as outfile:
 			for i in out["probabilities"]:
 				outfile.write("\t".join(list(map(str, i))) + "\n")
+		with open(os.path.join(path, "id2label.json"), "w") as outfile:
+			json.dump(id2label, outfile)
+		with open(os.path.join(path, "label2id.json"), "w") as outfile:
+			json.dump(label2id, outfile)
+
 
 	else:
 		with open(os.path.join(path, "predictions.txt"), "w") as outfile:
@@ -158,6 +163,7 @@ def predict(model, val_dataloader, path):
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--path", type=str, default="20newsgroup", help="")
+	parser.add_argument("--predict_filename", type=str, default=None, help="")
 	parser.add_argument("--max_grad_norm", default=1.0, type=float, help="")
 	parser.add_argument("--gradient_accumulation_steps", type=int, default=1,
 		        help="Number of updates steps to accumulate before performing a backward/update pass.")
@@ -186,7 +192,9 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	if os.path.exists(os.path.join(args.path, "test_embedded.pkl")):
+	if args.predict_filename is not None:
+		fn_val = os.path.join(args.path, args.predict_filename)
+	elif os.path.exists(os.path.join(args.path, "test_embedded.pkl")):
 		fn_val = os.path.join(args.path, "test_embedded.pkl")
 	else:
 		fn_val = os.path.join(args.path, "train_embedded.pkl")
