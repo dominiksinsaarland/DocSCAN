@@ -136,8 +136,13 @@ def predict(model, val_dataloader, path):
 	df = pd.read_pickle(fn_val)
 	labels=np.unique(df["label"])
 	if len(labels) > 1:
-		label2id = {label:i for i, label in enumerate(labels)}
-		id2label = {i:j for j,i in label2id.items()}
+		if isinstance(labels[0], np.int64):
+			label2id = {int(label):i for i, label in enumerate(labels)}
+			id2label = {i:j for j,i in label2id.items()}
+		else:
+			label2id = {label:i for i, label in enumerate(labels)}
+			id2label = {i:j for j,i in label2id.items()}
+
 
 		with open(os.path.join(path, "predictions.txt"), "w") as outfile:
 			for i in hungarian_match_metrics["reordered_preds"]:
