@@ -169,6 +169,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--path", type=str, default="20newsgroup", help="")
 	parser.add_argument("--predict_filename", type=str, default=None, help="")
+	parser.add_argument("--train_file", type=str, default=None, help="")
 	parser.add_argument("--max_grad_norm", default=1.0, type=float, help="")
 	parser.add_argument("--gradient_accumulation_steps", type=int, default=1,
 		        help="Number of updates steps to accumulate before performing a backward/update pass.")
@@ -204,7 +205,10 @@ if __name__ == "__main__":
 	else:
 		fn_val = os.path.join(args.path, "train_embedded.pkl")
 
-	fn_train = os.path.join(args.path, "train_neighbours_embeddings.pkl")
+	if args.train_file is not None:
+		fn_train = os.path.join(args.path, os.path.join(train_file))
+	else:
+		fn_train = os.path.join(args.path, "train_neighbours_embeddings.pkl")
 
 	if args.num_clusters == 1:
 		df = pd.read_pickle(fn_train)
