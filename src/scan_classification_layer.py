@@ -206,7 +206,8 @@ if __name__ == "__main__":
 		fn_val = os.path.join(args.path, "train_embedded.pkl")
 
 	if args.train_file is not None:
-		fn_train = os.path.join(args.path, os.path.join(train_file))
+		#fn_train = os.path.join(args.path, os.path.join(args.train_file))
+		fn_train = args.train_file
 	else:
 		fn_train = os.path.join(args.path, "train_neighbours_embeddings.pkl")
 
