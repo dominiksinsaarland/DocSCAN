@@ -1,6 +1,6 @@
-torch
+sentence-transformers
 tqdm
 pandas
 sklearn
 faiss
-sentence-transformers
+torch
