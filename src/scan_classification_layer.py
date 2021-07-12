@@ -69,20 +69,20 @@ class ScanDataset(Dataset):
 			sample = {"anchor": anchor, "label": label}
 		return sample
 	def collate_fn(self, batch):
-		out = torch.tensor([self.embeddings[i["anchor"]] for i in batch])
-		out_2 = torch.tensor([self.embeddings[i["neighbour"]] for i in batch])
+		out = torch.tensor([self.embeddings[i["anchor"]] for i in batch]).to(self.device)
+		out_2 = torch.tensor([self.embeddings[i["neighbour"]] for i in batch]).to(self.device)
 		return {"anchor": out, "neighbour": out_2}
 
 	def collate_fn_val(self, batch):
-		out = torch.tensor([i["anchor"] for i in batch])
+		out = torch.tensor([i["anchor"] for i in batch]).to(self.device)
 		labels = torch.tensor([i["label"] for i in batch]).to(self.device)
 		return {"anchor": out, "label": labels}
 
 class SCAN_model(torch.nn.Module):
-	def __init__(self, num_labels, dropout):
+	def __init__(self, num_labels, dropout, hidden_dim=768):
 		super(SCAN_model, self).__init__()
 		self.num_labels = num_labels
-		self.classifier = torch.nn.Linear(768, num_labels)
+		self.classifier = torch.nn.Linear(hidden_dim, num_labels)
 		self.device = "cuda" if torch.cuda.is_available() else "cpu"
 		self.dropout = dropout
 
@@ -235,9 +235,7 @@ if __name__ == "__main__":
 	results = []
 
 	for _ in range(args.num_runs):
-		model = SCAN_model(num_classes, args.dropout)
-		model.to(device)
-
+		model = SCAN_model(num_classes, args.dropout).to(device)
 		optimizer = torch.optim.Adam(model.parameters(), lr=0.001, eps=1e-8)
 		# Loss function
 		criterion = SCANLoss(entropy_weight=args.entropy_weight, entropy=args.entropy_term, experiment=args.path)
