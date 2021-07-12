@@ -4,4 +4,4 @@ pandas
 sklearn
 faiss
 torch
-yellowbrick
+yellowbrick==1.3.post1
