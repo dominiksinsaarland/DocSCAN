@@ -10,6 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
+import matplotlib.pyplot as plt
 
 class DocSCANPipeline():
 	def __init__(self, args):
@@ -83,6 +84,8 @@ class DocSCANPipeline():
 
 		try:
 			range_n_clusters = list(range(self.args.min_clusters, self.args.max_clusters, self.args.stepsize))
+			#print (range_n_clusters, distortion_scores)
+			#print (len(range_n_clusters), len(distortion_scores))
 			elbow_locator = KneeLocator(range_n_clusters, distortion_scores, **locator_kwargs)
 			elbow_value_ = elbow_locator.knee
 			elbow_score_ = range_n_clusters[range_n_clusters.index(elbow_value_)]
@@ -94,7 +97,8 @@ class DocSCANPipeline():
 			plt.legend()
 			plt.savefig(os.path.join(args.path, "optimal_number_of_clusters.png"))
 			return elbow_value_
-		except:
+		except Exception as e:
+			print (str(e))
 			print ("no knee found, perhaps something wrong with the data or the range of numbers of clusters searched over")
 			return self.args.min_clusters
 
@@ -133,8 +137,14 @@ class DocSCANPipeline():
 					# Add the sum of square distance to the distortion
 					distortion += distances.sum()
 				distortion_scores.append(distortion)
-			except:
+			except Exception as e:
+				#print (str(e))
+				#print ("failing with distortion scores, why? nclusters=", num_classes)
+				#input("")
 				pass
+
+		#print ("distortion_scores", distortion_scores)
+		#input("")
 		# plot elbow
 		elbow_value_ = self.plot_elbow(distortion_scores)
 		# train model with optimal value
@@ -160,11 +170,11 @@ class DocSCANPipeline():
 	def write_prototypical_examples(self, df, outfile="prototypical_examples_by_clusters.txt"):
 		with open(os.path.join(self.args.outpath, outfile), "w") as outfile:
 			for topic in tqdm(np.unique(df["clusters"])):
-				print (topic, type(topic))
+				#print (topic, type(topic))
 				df_topic = df[df["clusters"] == topic.item()]
 				probabilites = [i[int(topic)] for i in df["probabilities"]]
 				indices = np.argsort(probabilites)[::-1][:10]
-				print (indices)
+				#print (indices)
 				try:
 					for i in indices:
 						outfile.write(topic + "\t" + df.iloc[i]["sentence"] + "\n")
@@ -229,15 +239,8 @@ class DocSCANPipeline():
 		self.draw_wordclouds(df)
 
 
-
-
-
-
-
-
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-
 	parser.add_argument("--infile", type=str, help="path to infile/dataframe")
 	parser.add_argument("--data_format", type=str, default="from_txt", help="whether infile points to a txt file where each line is a sentence or to a dataframe")
 	parser.add_argument("--outpath", type=str, help="path to output path where output of docscan gets saved")
@@ -246,8 +249,8 @@ if __name__ == "__main__":
 	parser.add_argument("--topk", type=int, default=5, help="numbers of neighbors retrieved to build SCAN training set")
 	parser.add_argument("--num_classes", type=int, default=10, help="numbers of clusters")
 	parser.add_argument("--min_clusters", default=10, type=int, help="lower bound of clusters to search through to generate elbow")
-	parser.add_argument("--max_clusters", default=26, type=int, help="upper bound of clusters to search through to generate elbow")
-	parser.add_argument("--stepsize", default=1, type=int, help="2")
+	parser.add_argument("--max_clusters", default=22, type=int, help="upper bound of clusters to search through to generate elbow")
+	parser.add_argument("--stepsize", default=2, type=int, help="2")
 	parser.add_argument("--batch_size", default=64, type=int, help="Batch size per GPU/CPU for training.")
 	parser.add_argument("--wordcloud_frequencies", default="tf-idf", type=str, help="wordcount weighting, either tf-idf or raw counts")
 	parser.add_argument("--dropout", default=0.1, type=float, help="dropout for DocSCAN model")
