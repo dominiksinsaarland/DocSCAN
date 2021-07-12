@@ -228,7 +228,7 @@ class DocSCANPipeline():
 		df["probabilities"] = probabilities
 
 		# save docscan output
-		df.to_csv(os.path.join(args.outpath, "docscan_clusters.csv"))
+		df.to_csv(os.path.join(self.args.outpath, "docscan_clusters.csv"))
 
 		# visualizations
 		print ("finding prototypical sentences for each cluster...")
