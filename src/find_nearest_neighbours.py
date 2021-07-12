@@ -25,7 +25,7 @@ if __name__ == "__main__":
 		path_out = os.path.join(args.path, "train_neighbours.jsonl")
 
 	df_train = pd.read_pickle(fn_train)
-	X_train = np.array(df_train["embeddings"].tolist())
+	X_train = np.array(df_train["embeddings"].tolist(), dtype=np.float32)
 
 	print (np.shape(X_train))
 	feature_dim = np.shape(X_train[-1])
