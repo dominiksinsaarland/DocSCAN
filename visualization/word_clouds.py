@@ -115,32 +115,15 @@ if __name__ == "__main__":
 	if args.frequencies == "tf-idf":
 		vectorizer = TfidfVectorizer(stop_words='english', min_df=5, max_df=0.75, max_features=10000)
 		vectorizer.fit(df["sentence"])
-		# pass
-		"""
-		feature_names = vectorizer.get_feature_names()
-		dense = vecs.todense().tolist()
-		df_tfidf = pd.DataFrame(lst1, columns=feature_names)
-		#lst1 = dense.tolist()
-		df["tf-idf"] = dense.tolist()
-		"""
-	#print (df["tf-idf"])
 
 	for topic in tqdm(np.unique(clusters)):
-		df_topic = df[df["clusters"] == topic]
-		#print (topic, len(df_topic))
-		if args.frequencies == "tf-idf":
-			generate_word_clouds(topic, df_topic, nlp, outpath, vectorizer)
-		else:
-			generate_word_clouds(topic, df_topic, nlp, outpath)
+		try:
+			df_topic = df[df["clusters"] == topic]
+			#print (topic, len(df_topic))
+			if args.frequencies == "tf-idf":
+				generate_word_clouds(topic, df_topic, nlp, outpath, vectorizer)
+			else:
+				generate_word_clouds(topic, df_topic, nlp, outpath)
+		except:
+			pass
 
-	"""
-	genearte_word_clouds
-	# right
-	print (df.columns)
-	for i,j in zip(clusters, df["sentence"]):
-		print (i, "--",j)
-		input("")
-
-	#preprocess(args.path, args.infile)
-
-	"""
