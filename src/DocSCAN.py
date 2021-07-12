@@ -95,7 +95,7 @@ class DocSCANPipeline():
 
 			plt.axvline(elbow_value_, c="tab:red", linestyle="--", label=elbow_label)
 			plt.legend()
-			plt.savefig(os.path.join(args.path, "optimal_number_of_clusters.png"))
+			plt.savefig(os.path.join(self.args.outpath, "optimal_number_of_clusters.png"))
 			return elbow_value_
 		except Exception as e:
 			print (str(e))
