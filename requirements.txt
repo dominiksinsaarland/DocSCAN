@@ -4,3 +4,4 @@ pandas
 sklearn
 faiss
 torch
+yellowbrick
