@@ -118,7 +118,7 @@ class DocSCANPipeline():
 			criterion.to(self.device)
 
 			# get dataloaders
-			batch_size = max(self.args.batch_size, args.num_classes * 4) # well, if we try to fit 300 clusters, we probably want a batchsize bigger than 64
+			batch_size = max(self.args.batch_size, num_classes * 4) # well, if we try to fit 300 clusters, we probably want a batchsize bigger than 64
 			train_dataloader = torch.utils.data.DataLoader(train_dataset, shuffle=True, collate_fn = train_dataset.collate_fn, batch_size=batch_size)
 			predict_dataloader = torch.utils.data.DataLoader(predict_dataset, shuffle=False, collate_fn = predict_dataset.collate_fn_predict, batch_size=batch_size)
 			# train
