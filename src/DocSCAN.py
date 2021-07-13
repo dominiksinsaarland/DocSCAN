@@ -189,13 +189,16 @@ class DocSCANPipeline():
 		if self.args.wordcloud_frequencies == "tf-idf":
 			vectorizer = TfidfVectorizer(stop_words='english', min_df=5, max_df=0.75, max_features=10000)
 			vectorizer.fit(df["sentence"])
-		for topic in tqdm(np.unique(df["clusters"])):
-			df_topic = df[df["clusters"] == topic.item()]
-			if self.args.wordcloud_frequencies == "tf-idf":
-				generate_word_clouds(topic, df_topic, nlp, outpath, vectorizer)
-			else:
-				generate_word_clouds(topic, df_topic, nlp, outpath)
 
+		for topic in tqdm(np.unique(df["clusters"])):
+			try:
+				df_topic = df[df["clusters"] == topic.item()]
+				if self.args.wordcloud_frequencies == "tf-idf":
+					generate_word_clouds(topic, df_topic, nlp, outpath, vectorizer)
+				else:
+					generate_word_clouds(topic, df_topic, nlp, outpath)
+			except ZeroDivisionError:
+				pass
 
 
 
