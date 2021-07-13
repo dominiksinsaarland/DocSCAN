@@ -205,7 +205,7 @@ class DocSCANPipeline():
 	def run_main(self, sentences=None):
 		# embedd using SBERT
 		print ("loading data...")
-		if sentences is not None:
+		if sentences is None:
 			df = self.load_data()
 		else:
 			df = pd.DataFrame(sentences, columns=["sentence"])
