@@ -161,7 +161,7 @@ class DocSCANPipeline():
 		train_dataloader = torch.utils.data.DataLoader(train_dataset, shuffle=True, collate_fn = train_dataset.collate_fn, batch_size=batch_size)
 		predict_dataloader = torch.utils.data.DataLoader(predict_dataset, shuffle=False, collate_fn = predict_dataset.collate_fn_predict, batch_size=batch_size)
 		# train
-		model = self.train(model, optimizer, criterion, train_dataloader)
+		model = self.train(model, optimizer, criterion, train_dataloader, num_classes)
 		# predict
 		predictions, probabilities = self.get_predictions(model, predict_dataloader)
 
