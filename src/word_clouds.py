@@ -57,25 +57,26 @@ def generate_word_clouds(topic, df_topic, nlp, outpath, vectorizer=None):
 				  height=600,width=800).generate_from_frequencies(word_counts)
 		#print (word_counts.most_common(n=25))
 
-	if topic.isdigit():
-		if vectorizer is not None:
-			# I don't know what I am doing, but this retrieves column names of five highest tf-idf values
-			row = df_tfidf.T.sum(axis=1).nlargest()
-			#print (row)
-			names, _ = list(zip(*row.items()))
-			#print (names)
-			#names, _ = list(zip(*df_tfidf.T.sum(axis=1).nlargest().items()))
-			if len(topic) == 1:
-				topic = "0" + topic	
-			save_filename = topic + "_" + "_".join(names)
-		else:
-			#print (topic)
-			# if we don't have topic label, but just e.g. cluster "86", we take the first five words as a description
-			if len(topic) == 1:
-				topic = "0" + topic	
-			save_filename = topic + "_" + "_".join([i[0] for i in word_counts.most_common(n=5)])
+
+	topic = str(topic)
+	if vectorizer is not None:
+		# I don't know what I am doing, but this retrieves column names of five highest tf-idf values
+		row = df_tfidf.T.sum(axis=1).nlargest()
+		#print (row)
+		names, _ = list(zip(*row.items()))
+		#print (names)
+		#names, _ = list(zip(*df_tfidf.T.sum(axis=1).nlargest().items()))
+		topic = str(topic)
+		if len(topic) == 1:
+			topic = "0" + topic	
+		save_filename = topic + "_" + "_".join(names)
 	else:
-		save_filename = topic + ".png"
+		#print (topic)
+		# if we don't have topic label, but just e.g. cluster "86", we take the first five words as a description
+		if len(topic) == 1:
+			topic = "0" + topic	
+		save_filename = topic + "_" + "_".join([i[0] for i in word_counts.most_common(n=5)])
+
 	plt.clf()
 	plt.imshow(wordcloud,interpolation="bilinear")
 	plt.axis("off")

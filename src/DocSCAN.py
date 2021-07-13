@@ -11,6 +11,8 @@ from tqdm import tqdm
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 import matplotlib.pyplot as plt
+from word_clouds import generate_word_clouds
+from spacy.lang.en import English
 
 class DocSCANPipeline():
 	def __init__(self, args):
@@ -170,32 +172,29 @@ class DocSCANPipeline():
 	def write_prototypical_examples(self, df, outfile="prototypical_examples_by_clusters.txt"):
 		with open(os.path.join(self.args.outpath, outfile), "w") as outfile:
 			for topic in tqdm(np.unique(df["clusters"])):
-				#print (topic, type(topic))
 				df_topic = df[df["clusters"] == topic.item()]
 				probabilites = [i[int(topic)] for i in df["probabilities"]]
 				indices = np.argsort(probabilites)[::-1][:10]
-				#print (indices)
-				try:
-					for i in indices:
-						outfile.write(topic + "\t" + df.iloc[i]["sentence"] + "\n")
-				except:
-					pass
+				for i in indices:
+					outfile.write(str(topic) + "\t" + df.iloc[i]["sentence"] + "\n")
 
 	def draw_wordclouds(self, df, outpath="wordclouds"):
+
+		nlp = English()
+		tokenizer = nlp.Defaults.create_tokenizer(nlp)
+		nlp.add_pipe(nlp.create_pipe('sentencizer'))
+
 		outpath = os.path.join(self.args.outpath, outpath)
 		os.makedirs(outpath, exist_ok=True)
 		if self.args.wordcloud_frequencies == "tf-idf":
 			vectorizer = TfidfVectorizer(stop_words='english', min_df=5, max_df=0.75, max_features=10000)
 			vectorizer.fit(df["sentence"])
 		for topic in tqdm(np.unique(df["clusters"])):
-			try:
-				df_topic = df[df["clusters"] == topic.item()]
-				if self.args.frequencies == "tf-idf":
-					generate_word_clouds(topic, df_topic, nlp, outpath, vectorizer)
-				else:
-					generate_word_clouds(topic, df_topic, nlp, outpath)
-			except:
-				pass
+			df_topic = df[df["clusters"] == topic.item()]
+			if self.args.wordcloud_frequencies == "tf-idf":
+				generate_word_clouds(topic, df_topic, nlp, outpath, vectorizer)
+			else:
+				generate_word_clouds(topic, df_topic, nlp, outpath)
 
 
 
