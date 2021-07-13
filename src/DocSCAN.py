@@ -98,7 +98,7 @@ class DocSCANPipeline():
 			plt.axvline(elbow_value_, c="tab:red", linestyle="--", label=elbow_label)
 			plt.legend()
 			plt.savefig(os.path.join(self.args.outpath, "optimal_number_of_clusters.png"))
-			return elbow_value_
+			return int(elbow_value_)
 		except Exception as e:
 			print (str(e))
 			print ("no knee found, perhaps something wrong with the data or the range of numbers of clusters searched over")
