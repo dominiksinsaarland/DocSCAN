@@ -59,11 +59,11 @@ class DocSCANPipeline():
 		return predictions, probs
 
 
-	def train(self, model, optimizer, criterion, train_dataloader):
+	def train(self, model, optimizer, criterion, train_dataloader, num_classes):
 		train_iterator = range(int(self.args.num_epochs))
 		# train
 		for epoch in train_iterator:
-			bar_desc = "Epoch %d of %d | Iteration" % (epoch + 1, len(train_iterator))
+			bar_desc = "Epoch %d of %d | num classes %d | Iteration" % (epoch + 1, len(train_iterator), num_classes)
 			epoch_iterator = tqdm(train_dataloader, desc=bar_desc)
 			for step, batch in enumerate(epoch_iterator):
 				optimizer.zero_grad()
@@ -118,11 +118,11 @@ class DocSCANPipeline():
 			criterion.to(self.device)
 
 			# get dataloaders
-			batch_size = max(self.args.batch_size, self.args.num_classes * 4) # well, if we try to fit 300 clusters, we probably want a batchsize bigger than 64
+			batch_size = max(self.args.batch_size, args.num_classes * 4) # well, if we try to fit 300 clusters, we probably want a batchsize bigger than 64
 			train_dataloader = torch.utils.data.DataLoader(train_dataset, shuffle=True, collate_fn = train_dataset.collate_fn, batch_size=batch_size)
 			predict_dataloader = torch.utils.data.DataLoader(predict_dataset, shuffle=False, collate_fn = predict_dataset.collate_fn_predict, batch_size=batch_size)
 			# train
-			model = self.train(model, optimizer, criterion, train_dataloader)
+			model = self.train(model, optimizer, criterion, train_dataloader, num_classes)
 			# predict
 			predictions, probabilities = self.get_predictions(model, predict_dataloader)
 
@@ -157,7 +157,7 @@ class DocSCANPipeline():
 		criterion.to(self.device)
 
 		# get dataloaders
-		batch_size = max(self.args.batch_size, self.args.num_classes * 4) # well, if we try to fit 300 clusters, we probably want a batchsize bigger than 64
+		batch_size = max(self.args.batch_size, num_classes * 4) # well, if we try to fit 300 clusters, we probably want a batchsize bigger than 64
 		train_dataloader = torch.utils.data.DataLoader(train_dataset, shuffle=True, collate_fn = train_dataset.collate_fn, batch_size=batch_size)
 		predict_dataloader = torch.utils.data.DataLoader(predict_dataset, shuffle=False, collate_fn = predict_dataset.collate_fn_predict, batch_size=batch_size)
 		# train
