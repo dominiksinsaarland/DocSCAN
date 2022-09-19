@@ -1,6 +1,6 @@
 # DocSCAN
 
-This is the code base for our paper [DocSCAN: Unsupervised Text Classification via Learning from Neighbors](https://arxiv.org/abs/2105.04024)
+This is the code base for our paper [DocSCAN: Unsupervised Text Classification via Learning from Neighbors](https://aclanthology.org/2022.konvens-1.4/), accepted at [KONVENS 2022](https://konvens2022.uni-potsdam.de/).
 
 ## Installation
 
