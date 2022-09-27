@@ -33,6 +33,15 @@ Other output generated is
 
 Also, if no number of classes is provided, the program automatically determines the number of clusters using an adapted elbow method from [yellowbrick](https://www.scikit-yb.org/en/latest/api/cluster/elbow.html). If so, --min_clusters, --max_clusters and --stepsize should be provided. However, this is rather experimental! 
 
+### other input format
+
+input can also be a pandas dataframe with a column "sentence". If this is more convenient, run with
+
+```shell
+PYTHONPATH=src python src/DocSCAN.py --infile 20newsgroup_sample.csv --outpath 20newsgroup --num_classes 20 --data_format from_csv
+```
+
+
 ## Replicate Paper Experiments
 
 Run with 
