@@ -25,7 +25,7 @@ class DocSCANPipeline():
 			with open(self.args.infile) as f:
 				sentences = [line.strip() for line in f]
 			df = pd.DataFrame(sentences, columns=["sentence"])
-		elif args.data_format == "from_csv":
+		elif self.args.data_format == "from_csv":
 			df = pd.read_csv(self.args.infile)
 		return df
 			
