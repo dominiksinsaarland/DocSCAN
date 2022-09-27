@@ -10,7 +10,12 @@ Major code refactoring, the whole repo should be way more user friendly now!
 
 Assuming [Anaconda](https://docs.anaconda.com/anaconda/install/) and linux, the environment can be installed with the following command:
 ```shell
-bash setup_environment.sh
+conda create -n scan python=3.6
+conda activate scan
+
+pip install -U sentence-transformers
+conda install faiss-cpu -c pytorch
+pip install -r requirements.txt
 ```
 ## Run DOCSCAN on text dataset
 
