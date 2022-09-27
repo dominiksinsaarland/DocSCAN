@@ -6,7 +6,6 @@ import torch
 import random
 import gc
 
-from losses import SCANLoss
 from collections import defaultdict
 import numpy as np
 from torch.utils.data import Dataset
@@ -21,7 +20,6 @@ from sklearn.model_selection import StratifiedKFold
 from utils import *
 from sklearn.metrics.pairwise import pairwise_distances
 
-from kneelocator import KneeLocator
 import matplotlib.pyplot as plt
 
 #from visualizations import generate_word_clouds

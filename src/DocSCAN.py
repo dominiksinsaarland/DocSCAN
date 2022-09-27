@@ -1,17 +1,17 @@
 import sys, os, json, argparse
 import pandas as pd
 from sentence_transformers import SentenceTransformer
-from memory import MemoryBank
+from utils.memory import MemoryBank
 import torch
-from DocSCAN_utils import DocScanDataset, DocScanModel
-from losses import SCANLoss
-from kneelocator import KneeLocator
+from utils.DocSCAN_utils import DocScanDataset, DocScanModel
+from utils.losses import SCANLoss
+from utils.kneelocator import KneeLocator
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 import matplotlib.pyplot as plt
-from word_clouds import generate_word_clouds
+from utils.word_clouds import generate_word_clouds
 from spacy.lang.en import English
 
 class DocSCANPipeline():
@@ -54,7 +54,7 @@ class DocSCANPipeline():
 		with torch.no_grad():
 			for i, batch in enumerate(epoch_iterator):
 				output_i = model(batch["anchor"])
-				probs.extend(torch.nn.functional.softmax(output_i, dim=1).cpu().numpy())
+				probs.extend(torch.nn.functional.softmax(output_i, dim=1).cpu().tolist())
 				predictions.extend(torch.argmax(output_i, dim=1).cpu().numpy())
 		return predictions, probs
 
@@ -104,6 +104,29 @@ class DocSCANPipeline():
 			print ("no knee found, perhaps something wrong with the data or the range of numbers of clusters searched over")
 			return self.args.min_clusters
 
+	def train_model(self):
+		train_dataset = DocScanDataset(self.neighbor_dataset, self.X, mode="train")
+		predict_dataset = DocScanDataset(self.neighbor_dataset, self.X, self.X, mode="predict")
+
+		num_classes = self.args.num_classes
+		model = DocScanModel(num_classes, self.args.dropout).to(self.device)
+		optimizer = torch.optim.Adam(model.parameters(), lr=0.001, eps=1e-8)
+		criterion = SCANLoss()
+		criterion.to(self.device)
+
+		# get dataloaders
+		batch_size = max(self.args.batch_size, num_classes * 4) # well, if we try to fit 300 clusters, we probably want a batchsize bigger than 64
+		train_dataloader = torch.utils.data.DataLoader(train_dataset, shuffle=True, collate_fn = train_dataset.collate_fn, batch_size=batch_size)
+		predict_dataloader = torch.utils.data.DataLoader(predict_dataset, shuffle=False, collate_fn = predict_dataset.collate_fn_predict, batch_size=batch_size)
+		# train
+		model = self.train(model, optimizer, criterion, train_dataloader, num_classes)
+		# predict
+		predictions, probabilities = self.get_predictions(model, predict_dataloader)
+
+		return predictions, probabilities
+
+
+	
 	def calculate_distortion_scores_and_train_model(self):
 		# 	def __init__(self, neigbhors_df, embeddings, test_embeddings="", mode="train"):
 		train_dataset = DocScanDataset(self.neighbor_dataset, self.X, mode="train")
@@ -204,6 +227,7 @@ class DocSCANPipeline():
 
 	def run_main(self, sentences=None):
 		# embedd using SBERT
+		print (self.args.num_classes)
 		print ("loading data...")
 		if sentences is None:
 			df = self.load_data()
@@ -224,16 +248,21 @@ class DocSCANPipeline():
 
 
 		print ("compute optimal amount of clusters...")
-		predictions, probabilities, elbow_value_ = self.calculate_distortion_scores_and_train_model()
+		if self.args.num_classes is None:
+			predictions, probabilities, elbow_value_ = self.calculate_distortion_scores_and_train_model()
+			self.args.num_classes = elbow_value_
+		else:
+			predictions, probabilities = self.train_model()
+		
 
 
-		print ("docscan trained with n=", elbow_value_, "clusters...")
+		print ("docscan trained with n=", self.args.num_classes, "clusters...")
  
 		df["clusters"] = predictions
 		df["probabilities"] = probabilities
 
 		# save docscan output
-		df.to_csv(os.path.join(self.args.outpath, "docscan_clusters.csv"))
+		df.to_csv(os.path.join(self.args.outpath, "docscan_clusters.csv"), index=False)
 
 		# visualizations
 		print ("finding prototypical sentences for each cluster...")
@@ -246,13 +275,13 @@ class DocSCANPipeline():
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--infile", type=str, help="path to infile/dataframe")
+	parser.add_argument("--infile", type=str, help="path to infile/dataframe", required=True)
 	parser.add_argument("--data_format", type=str, default="from_txt", help="whether infile points to a txt file where each line is a sentence or to a dataframe")
 	parser.add_argument("--outpath", type=str, help="path to output path where output of docscan gets saved")
 	parser.add_argument("--sbert_model", default="bert-base-nli-mean-tokens", type=str, help="SBERT model to use to embedd sentences")
 	parser.add_argument("--max_seq_length", default=128, type=int, help="max seq length of sbert model, sequences longer than this get truncated at this value")
 	parser.add_argument("--topk", type=int, default=5, help="numbers of neighbors retrieved to build SCAN training set")
-	parser.add_argument("--num_classes", type=int, default=10, help="numbers of clusters")
+	parser.add_argument("--num_classes", type=int, default=None, help="numbers of clusters")
 	parser.add_argument("--min_clusters", default=10, type=int, help="lower bound of clusters to search through to generate elbow")
 	parser.add_argument("--max_clusters", default=22, type=int, help="upper bound of clusters to search through to generate elbow")
 	parser.add_argument("--stepsize", default=2, type=int, help="2")
